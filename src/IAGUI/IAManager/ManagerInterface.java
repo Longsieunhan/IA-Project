@@ -20,6 +20,9 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -27,7 +30,7 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class ManagerInterface extends JFrame implements ActionListener {
 
-    public static final Color BLUE_COLOR = new Color(0, 200, 250);
+    public static final Color BLUE_COLOR = new Color(35, 79, 30);
     public static final Font BIG_FONT = new Font("Comic Sans MS", Font.BOLD | Font.ITALIC, 40);
 
     // Components
@@ -35,13 +38,16 @@ public class ManagerInterface extends JFrame implements ActionListener {
     private JLabel titleLabel;
     private JButton attendanceButton, feedbackButton,
       quitButton, notificationButton, workingButton, employeeList;
-    
+    private JMenuBar mainMenu;
+    private JMenu subMenu;
+    private JMenuItem About;
+    private JMenuItem Roles;
 
     public ManagerInterface() {
         super("Employee Working Process");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         getContentPane().setBackground(BLUE_COLOR);
-        setLayout(new GridLayout(5, 1)); // Increased rows for better layout
+        setLayout(new GridLayout(10, 1)); // Increased rows for better layout
 
         // Title Label
         titleLabel = new JLabel("Manager Working Process", SwingConstants.CENTER);
@@ -53,6 +59,19 @@ public class ManagerInterface extends JFrame implements ActionListener {
         spacePanel1.setPreferredSize(new Dimension(150, 50)); // Adjust height as needed
         add(spacePanel1);
 
+        
+        mainMenu = new JMenuBar();
+        subMenu = new JMenu("Menu");
+        About = new JMenuItem("About");
+        About.addActionListener(this);
+        Roles = new JMenuItem("Roles");
+        Roles.addActionListener(this);
+        
+        mainMenu.add(subMenu);
+        subMenu.add(About);
+        subMenu.add(Roles);
+        this.setJMenuBar(mainMenu);
+        
         // Buttons
         attendanceButton = new JButton("Attendance");
         attendanceButton.setPreferredSize(new Dimension(150, 50));

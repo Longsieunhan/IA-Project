@@ -1,9 +1,9 @@
 
 package IAGUI;
 
+import static IAGUI.Login.LoginPage.BLUE_COLOR;
 import IAGUI.UpdateEmployeeList;
 import IAGUI.DeleteEmployeeList;
-import IAGUI.InsertEmployeeList;
 import IAGUI.JavaDBAccessIA;
 import IAGUI.JavaDBAccessIA;
 import java.awt.BorderLayout;
@@ -103,7 +103,7 @@ public class DisplayEmployeeData extends JFrame implements ActionListener
 public static void main(String[] args) {
   String dbName = "List";
   String tableName = "EmployeeList";
-  String[] columnHeaders = { "employee_name", "employee_age", "condition"}; 
+  String[] columnHeaders = {"ID", "employee_name", "employee_age", "condition"}; 
   new DisplayEmployeeData(dbName, tableName, columnHeaders);
 }
   

@@ -31,7 +31,7 @@ public class ManagerNotification extends JFrame implements ActionListener {
     private JLabel titleLabel;
     private JTextArea NotificationText;
     private JButton submitButton, quitButton;
-    public static final Color BLUE_COLOR = new Color(0, 200, 250);
+    public static final Color BLUE_COLOR = new Color(35, 79, 30);
     public static final Font BIG_FONT = new Font("Comic Sans MS", Font.BOLD | Font.ITALIC, 40);
 
     public ManagerNotification() {

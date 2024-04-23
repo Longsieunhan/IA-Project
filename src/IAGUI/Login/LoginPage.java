@@ -33,7 +33,7 @@ public class LoginPage extends JFrame implements ActionListener, ItemListener
 {
   // Constants
 
-  public static final Color BLUE_COLOR = new Color(0, 200, 250);
+  public static final Color BLUE_COLOR = new Color(35, 79, 30);
   public static final Color BLACK_COLOR = new Color(0, 0, 0);
   public static final Font BIG_FONT = new Font("Comic Sans MS", Font.BOLD | Font.ITALIC, 40);
 

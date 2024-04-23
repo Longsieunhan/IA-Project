@@ -9,7 +9,7 @@ package IAGUI.IAManager;
  * @author nguyenthanhlong
  */
 
-
+import static IAGUI.Login.LoginPage.BLUE_COLOR;
 import IAGUI.IAManager.ManagerInterface;
 import static IAGUI.Login.LoginPage.BIG_FONT;
 import java.awt.BorderLayout;

@@ -4,6 +4,7 @@
  */
 package IAGUI.IAEmployee;
 
+import static IAGUI.Login.LoginPage.BLUE_COLOR;
 import IAGUI.IAManager.ManagerFeedback;
 import IAGUI.JavaDBAccessIA;
 import java.awt.BorderLayout;
@@ -35,7 +36,7 @@ public class EmployeeFeedback extends JFrame implements ActionListener
   private JButton submitButton, quitButton;
   private JLabel nameLabel;
   private JLabel descriptionLabel;
-  public static final Color BLUE_COLOR = new Color(0, 200, 250);
+  public static final Color BLUE_COLOR = new Color(35, 79, 30);
   public static final Font BIG_FONT = new Font("Comic Sans MS", Font.BOLD | Font.ITALIC, 40);
 
   public EmployeeFeedback()

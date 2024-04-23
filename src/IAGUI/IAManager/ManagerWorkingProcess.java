@@ -4,6 +4,7 @@
  */
 package IAGUI.IAManager;
 
+import static IAGUI.Login.LoginPage.BLUE_COLOR;
 import IAGUI.DeleteTaskList;
 import IAGUI.InsertTaskList;
 import IAGUI.UpdateTaskList;
@@ -40,7 +41,7 @@ public class ManagerWorkingProcess extends JFrame implements ActionListener {
     public ManagerWorkingProcess() {
         super("Manager Working Process");
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.getContentPane().setBackground(Color.BLUE);
+        this.getContentPane().setBackground(BLUE_COLOR);
         this.setBounds(100, 200, 600, 400);
         this.setLayout(new BorderLayout());
 

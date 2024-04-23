@@ -1,5 +1,6 @@
 package IAGUI.IAEmployee;
 
+import static IAGUI.Login.LoginPage.BLUE_COLOR;
 import IAGUI.IAEmployee.EmployeeFeedback;
 import IAGUI.IAEmployee.EmployeeAttendance;
 import java.awt.Color;
@@ -18,7 +19,7 @@ import javax.swing.SwingConstants;
 
 public class EmployeeInterface extends JFrame implements ActionListener {
 
-    public static final Color BLUE_COLOR = new Color(0, 200, 250);
+    public static final Color BLUE_COLOR = new Color(35, 79, 30);
     public static final Font BIG_FONT = new Font("Comic Sans MS", Font.BOLD | Font.ITALIC, 40);
 
     // Components

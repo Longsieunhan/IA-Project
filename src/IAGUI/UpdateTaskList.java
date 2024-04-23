@@ -28,9 +28,11 @@ public class UpdateTaskList extends JFrame implements ActionListener
 {
 
   // data entry
-  private JTextField Name;
-  private JTextField Age;
-  private JTextField Condition;
+  private JTextField taskName;
+  private JTextField taskDescription;
+  private JTextField taskDeadline;
+  private JLabel idLabel;
+  private JTextField idField;
   // control buttons
   private JButton updateButton;
   private JButton doneButton;
@@ -41,26 +43,31 @@ public class UpdateTaskList extends JFrame implements ActionListener
   {
     //Format the frame
     super("Edit Page");
-    this.setBounds(100, 200, 600, 400);
+    this.setBounds(100, 200, 1000, 400);
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.getContentPane().setBackground(BLUE_COLOR);
     this.setLayout(new GridLayout(4, 1));
 
-    Name = new JTextField(20);
-    Age = new JTextField(20);
-    Condition = new JTextField(20);
+    taskName = new JTextField(20);
+    taskDescription = new JTextField(20);
+    taskDeadline = new JTextField(20);
 
     JLabel NameLabel = new JLabel("Task name");
     JLabel DescriptionLabel = new JLabel("Task description");
     JLabel TaskDeadlineLabel = new JLabel("Task deadline");
-
+     idLabel = new JLabel("Id");
+     idField = new JTextField(20);
+    
+    
     JPanel DataPanel = new JPanel();
+    DataPanel.add(idLabel);
+    DataPanel.add(idField);
     DataPanel.add(NameLabel);
-    DataPanel.add(Name);
+    DataPanel.add(taskName);
     DataPanel.add(DescriptionLabel);
-    DataPanel.add(Age);
+    DataPanel.add(taskDescription);
     DataPanel.add(TaskDeadlineLabel);
-    DataPanel.add(Condition);
+    DataPanel.add(taskDeadline);
 
     this.add(DataPanel, BorderLayout.CENTER);
 
@@ -86,49 +93,52 @@ public class UpdateTaskList extends JFrame implements ActionListener
     String command = e.getActionCommand();
     // db info
     String dbName = "List";
-    String tableName = "EmployeeList";
+    String tableName = "TaskList";
     String[] columnHeaders =
     {
-      "employee_name", "employee_age", "condition"
+      "Id", "task_name", "task_description", "task_deadline"
     };
     // connect to db
     JavaDBAccessIA objDb = new JavaDBAccessIA(dbName);
     Connection myDbConn = objDb.getDbConn();
     // db query
-    String dbQuery = "UPDATE EmployeeList SET employee_name = ?,employee_age =?, condition";
+    String dbQuery = "UPDATE EmployeeList SET Id = ?,task_name =?, task_description =?, task_deadline=? WHERE Id=?";
     // attributes   
-    String name = Name.getText();
-    int age = Integer.parseInt(Age.getText());
-    String condition = Condition.getText();
 
     if (command.equals("Update"))
     {
       // receive data from text fields
-//      try
-//      {
-//        PreparedStatement ps = myDbConn.prepareStatement(dbQuery);
-//        ps.setString(1, name);
-//        ps.setInt(2, age);
-//        ps.setString(3, condition);
-//        ps.executeUpdate();
-//        System.out.println("Data updated successfully into " + tableName);
-//      }
-//      catch (SQLException se)
-//      {
-//        System.out.println("Error updating data: " + se.getMessage());
-//        se.printStackTrace();
-//      } finally
-//      {
-//        try
-//        {
-//          myDbConn.close();
-//        }
-//        catch (SQLException ex)
-//        {
-//          System.out.println("Error closing database connection: " + ex.getMessage());
-//          ex.printStackTrace();
-//        }
-//      }
+      try
+      {
+        String name = taskName.getText();
+        int description = Integer.parseInt(taskDescription.getText());
+        String deadline = taskDeadline.getText();
+        int id = Integer.parseInt(idField.getText());
+        
+        PreparedStatement ps = myDbConn.prepareStatement(dbQuery);
+        ps.setInt(1, id);
+        ps.setString(2, name);
+        ps.setInt(3, description);
+        ps.setString(4, deadline);
+        ps.executeUpdate();
+        System.out.println("Data updated successfully into " + tableName);
+      }
+      catch (SQLException se)
+      {
+        System.out.println("Error updating data: " + se.getMessage());
+        se.printStackTrace();
+      } finally
+      {
+        try
+        {
+          myDbConn.close();
+        }
+        catch (SQLException ex)
+        {
+          System.out.println("Error closing database connection: " + ex.getMessage());
+          ex.printStackTrace();
+        }
+      }
       System.out.println("Data is updated");
     }
 
@@ -139,4 +149,3 @@ public class UpdateTaskList extends JFrame implements ActionListener
     new UpdateTaskList();
   }
 }
-

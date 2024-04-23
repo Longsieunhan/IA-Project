@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -28,12 +29,15 @@ public class DeleteEmployeeList extends JFrame implements ActionListener
   private JTextField Name;
   private JTextField Age;
   private JTextField Condition;
+  private JCheckBox checkBox;
+  private JLabel idLabel;
+  private JTextField idField;
 
   public DeleteEmployeeList()
   {
 
     super("Edit Page");
-    this.setBounds(100, 200, 600, 400);
+    this.setBounds(100, 200, 900, 400);
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.getContentPane().setBackground(BLUE_COLOR);
     this.setLayout(new GridLayout(4, 1));
@@ -41,12 +45,17 @@ public class DeleteEmployeeList extends JFrame implements ActionListener
     Name = new JTextField(20);
     Age = new JTextField(20);
     Condition = new JTextField(20);
+    idLabel = new JLabel("Id");
+    idField = new JTextField(20);
+    checkBox = new JCheckBox();
 
     JLabel NameLabel = new JLabel("Name");
     JLabel AgeLabel = new JLabel("Age");
     JLabel ConditionLabel = new JLabel("Condition");
 
     JPanel DataPanel = new JPanel();
+    DataPanel.add(idLabel);
+    DataPanel.add(idField);
     DataPanel.add(NameLabel);
     DataPanel.add(Name);
     DataPanel.add(AgeLabel);
@@ -70,20 +79,22 @@ public class DeleteEmployeeList extends JFrame implements ActionListener
 
     this.setVisible(true);
   }
-  public static void main(String[] arg) {
-   new DeleteEmployeeList();
+
+  public static void main(String[] arg)
+  {
+    new DeleteEmployeeList();
   }
 
+  // fix database - thieu id (primary key, identified, auto-increment) in tables
+  // checkbox to update and delete
   @Override
   public void actionPerformed(ActionEvent e)
   {
-    String name = Name.getText();
-    int age = Integer.parseInt(Age.getText());
-    String condition = Condition.getText();
 
     String dbName = "List";
     String tableName = "EmployeeList";
-    String query = "DELETE FROM EmployeeList WHERE employee_name = ? AND employee_age = ? AND condition = ?";
+    String[] columnNames = {"Id",",name","age","condition"};
+    String query = "DELETE FROM EmployeeList WHERE ID=? AND employee_name = ? AND employee_age = ? AND condition = ?";
 
     JavaDBAccessIA objAccess = new JavaDBAccessIA(dbName);
     Connection myDbConn = objAccess.getDbConn();
@@ -91,21 +102,26 @@ public class DeleteEmployeeList extends JFrame implements ActionListener
     if (e.getActionCommand().equals("Delete"))
     {
       System.out.println("Data is deleted");
-//      try
-//      {
-//        PreparedStatement ps = myDbConn.prepareStatement(query);
-//        ps.setString(1, name);
-//        ps.setInt(2, age);
-//        ps.setString(3, condition);
-//        ps.executeUpdate();
-//        System.out.println("Data delete successfully into " + tableName);
-//
-//      }
-//
-//      catch (SQLException se)
-//      {
-//        System.out.println("Need a number");
-//      }
+      try
+      {
+        String name = Name.getText();
+        int age = Integer.parseInt(Age.getText());
+        String condition = Condition.getText();
+        int id = Integer.parseInt(idField.getText());
+        PreparedStatement ps = myDbConn.prepareStatement(query);
+        ps.setInt(1, id);
+        ps.setString(2, name);
+        ps.setInt(3, age);
+        ps.setString(5, condition);
+        ps.executeUpdate();
+        System.out.println("Data delete successfully into " + tableName);
+
+      }
+
+      catch (SQLException se)
+      {
+        System.out.println("Need a number");
+      }
     }
   }
 }

@@ -8,6 +8,8 @@ package IAGUI;
  *
  * @author nguyenthanhlong
  */
+
+import IAGUI.IAManager.ManagerWorkingProcess;
 import static IAGUI.Login.LoginPage.BLUE_COLOR;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -55,6 +57,9 @@ public class InsertTaskList extends JFrame implements ActionListener {
 
         JButton AddButton = new JButton("Add");
         AddButton.addActionListener(this);
+        
+        JButton quitButton = new JButton("Quit");
+        quitButton.addActionListener(this);
 
         JButton ShowTheTable = new JButton("Show the table");
         ShowTheTable.addActionListener(this);
@@ -109,6 +114,11 @@ public class InsertTaskList extends JFrame implements ActionListener {
             String tableName = "TaskList";
             String[] columnHeaders = { "task_name", "task_description", "task_deadline" };
             new DisplayTaskData(dbName, tableName, columnHeaders);
+        }
+        
+        else if (e.getActionCommand().equals("Quit")) {
+          this.dispose();
+          new ManagerWorkingProcess();
         }
     }
 }

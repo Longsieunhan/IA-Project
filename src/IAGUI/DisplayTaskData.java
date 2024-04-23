@@ -4,7 +4,7 @@
  */
 package IAGUI;
 
-
+import static IAGUI.Login.LoginPage.BLUE_COLOR;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -41,7 +41,7 @@ String[] headers = {"task_name", "task_description", "task_deadline"};
 public DisplayTaskData (String dbName, String tableName, String[] tableHeaders) 
 {
   super("Display data");
-  this.setBounds(100, 50, 800, 600);
+  this.setBounds(100, 50, 800, 480);
   this.getContentPane().setBackground(Color.cyan);
   this.setDefaultCloseOperation(EXIT_ON_CLOSE);
   
@@ -61,7 +61,7 @@ public DisplayTaskData (String dbName, String tableName, String[] tableHeaders)
   header.setForeground(Color.WHITE);
   header.setFont(new Font("Arial", Font.BOLD, 20));
   
-  dbTable.setRowHeight(25);
+  dbTable.setRowHeight(200);
   scrollTable = new JScrollPane();
   scrollTable.getViewport().add(dbTable);
   dbTable.setFillsViewportHeight(true);

@@ -4,6 +4,7 @@
  */
 package IAGUI.IAEmployee;
 
+import static IAGUI.Login.LoginPage.BLUE_COLOR;
 import IAGUI.IAEmployee.EmployeeInterface;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -31,7 +32,7 @@ public class EmployeeNotification extends JFrame implements ActionListener {
     private JButton Edit;
     private JButton Delete; 
     private JButton  quitButton;
-    public static final Color BLUE_COLOR = new Color(0, 200, 250);
+    public static final Color BLUE_COLOR = new Color(35, 79, 30);
     public static final Font BIG_FONT = new Font("Comic Sans MS", Font.BOLD | Font.ITALIC, 40);
 
     public EmployeeNotification() {

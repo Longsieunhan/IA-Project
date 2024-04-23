@@ -8,6 +8,7 @@ package IAGUI.IAEmployee;
  *
  * @author nguyenthanhlong
  */
+import static IAGUI.Login.LoginPage.BLUE_COLOR;
 import IAGUI.IAEmployee.EmployeeInterface;
 import java.awt.BorderLayout;
 import java.awt.Color;
