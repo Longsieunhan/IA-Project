@@ -41,11 +41,6 @@ public class LoginPage extends JFrame implements ActionListener, ItemListener
   public static final Color BLUE_COLOR = new Color(35, 79, 30);
   public static final Color BLACK_COLOR = new Color(0, 0, 0);
   public static final Font BIG_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 40);
-  JComboBox<String> Rolesystem;
-  String[] RoleArray =
-  {
-    "Employee", "Manager",
-  };
 
   // Components
   private JLabel titleLabel, usernameLabel, passwordLabel;
@@ -69,9 +64,6 @@ public class LoginPage extends JFrame implements ActionListener, ItemListener
     managerFlag = true;
     employeeFlag = true;
 
-    Rolesystem = new JComboBox<>(RoleArray);
-    Rolesystem.addItemListener(this);
-
     // Title Label
     titleLabel = new JLabel("Login Page", SwingConstants.CENTER);
     titleLabel.setFont(BIG_FONT);
@@ -79,23 +71,20 @@ public class LoginPage extends JFrame implements ActionListener, ItemListener
     add(titleLabel);
 
     // Username Field
-    JPanel usernamePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+    JPanel loginPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
     usernameLabel = new JLabel("Username:");
     usernameLabel.setForeground(BLACK_COLOR);
     usernameField = new JTextField(15);
-    usernamePanel.add(usernameLabel);
-    usernamePanel.add(usernameField);
-    add(usernamePanel);
+    loginPanel.add(usernameLabel);
+    loginPanel.add(usernameField);
 
     // Password Field
-    JPanel passwordPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
     passwordLabel = new JLabel("Password:");
     passwordLabel.setForeground(BLACK_COLOR);
     passwordField = new JPasswordField(15);
-    passwordPanel.add(passwordLabel);
-    passwordPanel.add(passwordField);
-    passwordPanel.add(Rolesystem);
-    add(passwordPanel);
+    loginPanel.add(passwordLabel);
+    loginPanel.add(passwordField);
+    add(loginPanel);
 
     // Login Button
     loginButton = new JButton("Login");
@@ -119,22 +108,23 @@ public class LoginPage extends JFrame implements ActionListener, ItemListener
 
     setVisible(true);
   }
-  
-  public boolean CheckRole(Connection conn, String username, String role) {
+
+  public boolean CheckRole(Connection conn, String username, String role)
+  {
     PreparedStatement stmt;
     LoginPage e = new LoginPage();
     return true;
-    
+
   }
 
-  public boolean CheckAccount(Connection conn, String username, String password)
+  public String CheckAccount(Connection conn, String username, String password)
   {
     PreparedStatement stmt;
     LoginPage e = new LoginPage();
     try
     {
-      String sql = "SELECT * FROM USERS WHERE username = ? AND password = ?";
-
+      // Query to check username, password and fetch role
+      String sql = "SELECT role FROM USERS WHERE username = ? AND password = ?";
       stmt = conn.prepareStatement(sql);
       stmt.setString(1, username);
       stmt.setString(2, password);
@@ -142,23 +132,22 @@ public class LoginPage extends JFrame implements ActionListener, ItemListener
       ResultSet rst = stmt.executeQuery();
       if (!rst.next())
       {
-        System.out.println("No data");
-        return false;
+        System.out.println("No account found");
+        return null; // No account found
       }
-
       else
       {
-        System.out.println("There is data");
-        return true;
+        // Retrieve the role from the result set
+        String role = rst.getString("role");
+        System.out.println("Role: " + role);
+        return role; // Return the user's role
       }
-
     }
-
     catch (SQLException ex)
     {
-      System.out.println(ex.getMessage());
+      ex.printStackTrace();
+      return null; // Return null in case of an exception
     }
-    return true;
   }
 
   public static void main(String[] args)
@@ -188,47 +177,35 @@ public class LoginPage extends JFrame implements ActionListener, ItemListener
     String command = e.getActionCommand();
 
     // Perform login authentication here
-    if (command.equals("Login"))
-    {
-      this.dispose();
+    if (command.equals("Login")) {
+    try (Connection conn = DriverManager.getConnection(connectionURL, USER, PASS);) {
+        String role = CheckAccount(conn, username, password);
 
-      try (Connection conn = DriverManager.getConnection(connectionURL, USER, PASS);)
-      {
-
-        if (CheckAccount(conn, username, password))
-        {
-
-          if (Rolesystem.getSelectedItem().equals("Employee"))
-          {
-            // Open Employee Interface window
-
-            new EmployeeInterface(); // Pass username for future use
-            
-          }
-          else if (Rolesystem.getSelectedItem().equals("Manager"))
-          {
-            // Open Manager Interface window
-            dispose();
-            new ManagerInterface();
-          }
-          // Close the login window after opening the appropriate interface
-          else
-          {
-            // Login failed - display an error message
+        if (role == null) {
+            // Handle case where login fails
+            System.out.println("Invalid username or password");
+            // Show an error message to the user
             JOptionPane.showMessageDialog(this, "Invalid username or password!");
-          }
-
+        } else if (role.equals("Manager")) {
+            // Open Manager Interface
+            new ManagerInterface(); // Open manager window
+            System.out.println("Welcome, Manager!");
+            this.dispose(); // Close the login window only after successful login
+        } else if (role.equals("Employee")) {
+            // Open Employee Interface
+            new EmployeeInterface(); // Open employee window
+            System.out.println("Welcome, Employee!");
+            this.dispose(); // Close the login window only after successful login
+        } else {
+            // Handle any other roles or invalid roles
+            System.out.println("Unknown role: " + role);
         }
-
-      }
-      catch (SQLException se)
-      {
+    } catch (SQLException se) {
+        // SQL Exception handling (e.g., invalid username/password)
         System.out.println("Please enter your username correctly");
         JOptionPane.showMessageDialog(this, "Invalid username or password!");
-      }
-
-      this.dispose();
     }
+}
 
     if (command.equals("Forgot password"))
     {

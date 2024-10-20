@@ -1,2 +1,0 @@
-IAGUI.EmployeeWorkingProcess
-IAGUI.DisplayEmployeeData
