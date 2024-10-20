@@ -19,23 +19,33 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
-
-/**
- *
- * @author nguyenthanhlong
- */
+import javax.swing.ImageIcon;
+import java.awt.Image;
 import javax.swing.*;
 import java.awt.*;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class LoginPage extends JFrame implements ActionListener, ItemListener
 {
-  // Constants
 
+  // Constants
+  PreparedStatement stmt;
   public static final Color BLUE_COLOR = new Color(35, 79, 30);
   public static final Color BLACK_COLOR = new Color(0, 0, 0);
-  public static final Font BIG_FONT = new Font("Comic Sans MS", Font.BOLD | Font.ITALIC, 40);
+  public static final Font BIG_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 40);
+  JComboBox<String> Rolesystem;
+  String[] RoleArray =
+  {
+    "Employee", "Manager",
+  };
 
   // Components
   private JLabel titleLabel, usernameLabel, passwordLabel;
@@ -45,11 +55,6 @@ public class LoginPage extends JFrame implements ActionListener, ItemListener
   private JButton forpasswordButton;
   private JButton quitButton;
   private JPanel buttonPanel;
-  JComboBox<String> roleSystem;
-  String[] roleArray =
-  {
-    "Manager", "Employee"
-  };
   boolean managerFlag;
   boolean employeeFlag;
 
@@ -63,6 +68,9 @@ public class LoginPage extends JFrame implements ActionListener, ItemListener
 
     managerFlag = true;
     employeeFlag = true;
+
+    Rolesystem = new JComboBox<>(RoleArray);
+    Rolesystem.addItemListener(this);
 
     // Title Label
     titleLabel = new JLabel("Login Page", SwingConstants.CENTER);
@@ -79,9 +87,6 @@ public class LoginPage extends JFrame implements ActionListener, ItemListener
     usernamePanel.add(usernameField);
     add(usernamePanel);
 
-    roleSystem = new JComboBox<>(roleArray);
-    roleSystem.addActionListener(this);
-
     // Password Field
     JPanel passwordPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
     passwordLabel = new JLabel("Password:");
@@ -89,7 +94,7 @@ public class LoginPage extends JFrame implements ActionListener, ItemListener
     passwordField = new JPasswordField(15);
     passwordPanel.add(passwordLabel);
     passwordPanel.add(passwordField);
-    passwordPanel.add(roleSystem);
+    passwordPanel.add(Rolesystem);
     add(passwordPanel);
 
     // Login Button
@@ -114,6 +119,47 @@ public class LoginPage extends JFrame implements ActionListener, ItemListener
 
     setVisible(true);
   }
+  
+  public boolean CheckRole(Connection conn, String username, String role) {
+    PreparedStatement stmt;
+    LoginPage e = new LoginPage();
+    return true;
+    
+  }
+
+  public boolean CheckAccount(Connection conn, String username, String password)
+  {
+    PreparedStatement stmt;
+    LoginPage e = new LoginPage();
+    try
+    {
+      String sql = "SELECT * FROM USERS WHERE username = ? AND password = ?";
+
+      stmt = conn.prepareStatement(sql);
+      stmt.setString(1, username);
+      stmt.setString(2, password);
+
+      ResultSet rst = stmt.executeQuery();
+      if (!rst.next())
+      {
+        System.out.println("No data");
+        return false;
+      }
+
+      else
+      {
+        System.out.println("There is data");
+        return true;
+      }
+
+    }
+
+    catch (SQLException ex)
+    {
+      System.out.println(ex.getMessage());
+    }
+    return true;
+  }
 
   public static void main(String[] args)
   {
@@ -123,39 +169,76 @@ public class LoginPage extends JFrame implements ActionListener, ItemListener
   @Override
   public void itemStateChanged(ItemEvent e)
   {
-    managerFlag = false;
-    employeeFlag = false;
-    int index = roleSystem.getSelectedIndex();
 
-    if (index == 0)
-    {
-      managerFlag = true;
-    }
-    else
-    {
-      employeeFlag = true;
-    }
   }
 
   @Override
   public void actionPerformed(ActionEvent e)
   {
+
+    String USER = "root";
+    String PASS = "mysql1";
+    String connectionURL = "jdbc:mysql://localhost:3306/LIST";
+    String dbName = "LIST";
+    String tableName = "USERS";
+
     // Handle login button action
     String username = usernameField.getText();
     String password = new String(passwordField.getPassword());
     String command = e.getActionCommand();
+
     // Perform login authentication here
     if (command.equals("Login"))
     {
       this.dispose();
-      new ManagerInterface();
 
+      try (Connection conn = DriverManager.getConnection(connectionURL, USER, PASS);)
+      {
+
+        if (CheckAccount(conn, username, password))
+        {
+
+          if (Rolesystem.getSelectedItem().equals("Employee"))
+          {
+            // Open Employee Interface window
+
+            new EmployeeInterface(); // Pass username for future use
+            
+          }
+          else if (Rolesystem.getSelectedItem().equals("Manager"))
+          {
+            // Open Manager Interface window
+            dispose();
+            new ManagerInterface();
+          }
+          // Close the login window after opening the appropriate interface
+          else
+          {
+            // Login failed - display an error message
+            JOptionPane.showMessageDialog(this, "Invalid username or password!");
+          }
+
+        }
+
+      }
+      catch (SQLException se)
+      {
+        System.out.println("Please enter your username correctly");
+        JOptionPane.showMessageDialog(this, "Invalid username or password!");
+      }
+
+      this.dispose();
     }
+
     if (command.equals("Forgot password"))
     {
       this.dispose();
       new ForgotPasswordPage();
     }
-  }
 
+    if (command.equals("Quit"))
+    {
+      this.dispose();
+    }
+  }
 }

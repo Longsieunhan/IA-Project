@@ -6,18 +6,20 @@ package IAGUI.IAManager;
 
 /**
  *
- * @author nguyenthanhlong
  */
-
+import IAGUI.DisplayFeedback;
 import static IAGUI.Login.LoginPage.BLUE_COLOR;
-import IAGUI.IAManager.ManagerInterface;
+import static IAGUI.InsertEmployeeList.companyImage;
 import static IAGUI.Login.LoginPage.BIG_FONT;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -26,66 +28,83 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
-public class ManagerFeedback extends JFrame implements ActionListener {
-   JLabel titleLabel;
-   JTextArea feedbackText;
-   JButton quitButton;
-   JPanel buttonPanel;
-   JButton viewButton;
+public class ManagerFeedback extends JFrame implements ActionListener
+{
 
-    public ManagerFeedback() {
-        super("Manager Feedback");
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.getContentPane().setBackground(Color.BLUE);
-        this.setBounds(100, 200, 600, 400);
-        this.setLayout(new BorderLayout());
+  JLabel titleLabel;
+  JButton quitButton;
+  JPanel buttonPanel;
+  JButton viewButton;
+  public static final Color BLUE_COLOR = new Color(35, 79, 30);
+  public final URL IMG2_PATH = getClass().getResource("thanhlong.png");
+  public ImageIcon companyImage;
+  JLabel imageLabel;
+  JPanel imagePanel;
 
-        titleLabel = new JLabel("Manager Feedback", JLabel.CENTER);
-        titleLabel.setFont(BIG_FONT);
-        titleLabel.setForeground(Color.WHITE);
-        this.add(titleLabel, BorderLayout.NORTH);
+  public ManagerFeedback()
+  {
+    super("Manager Feedback");
+    this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+    this.getContentPane().setBackground(BLUE_COLOR);
+    this.setBounds(100, 200, 600, 400);
+    this.setLayout(new BorderLayout());
 
-        feedbackText = new JTextArea();
-        feedbackText.setPreferredSize(new Dimension(400, 100));
+    companyImage = new ImageIcon(new ImageIcon(IMG2_PATH).getImage().getScaledInstance(400, 200, Image.SCALE_DEFAULT));
 
-        JPanel feedbackPanel = new JPanel();
-        feedbackPanel.add(feedbackText);
-        this.add(feedbackPanel, BorderLayout.CENTER);
+    titleLabel = new JLabel("Manager Feedback", JLabel.CENTER);
+    titleLabel.setFont(BIG_FONT);
+    titleLabel.setForeground(Color.WHITE);
+    this.add(titleLabel, BorderLayout.NORTH);
 
-        viewButton = new JButton("View");
-        viewButton.setPreferredSize(new Dimension(150, 50));
-        viewButton.addActionListener(this);
-        
-        quitButton = new JButton("Quit");
-        quitButton.setPreferredSize(new Dimension(150, 50));
-        quitButton.addActionListener(this);
-        
+    imagePanel = new JPanel();
+    imageLabel = new JLabel(companyImage);
+    imagePanel.add(imageLabel);
+    this.add(imagePanel, BorderLayout.CENTER);
 
-        buttonPanel = new JPanel();
-        buttonPanel.add(quitButton);
-        add(buttonPanel, BorderLayout.SOUTH);
+    viewButton = new JButton("View");
+    viewButton.setPreferredSize(new Dimension(150, 50));
+    viewButton.addActionListener(this);
 
-        setLocationRelativeTo(null);
-        setVisible(true);
+    quitButton = new JButton("Quit");
+    quitButton.setPreferredSize(new Dimension(150, 50));
+    quitButton.addActionListener(this);
+
+    buttonPanel = new JPanel();
+    buttonPanel.add(viewButton);
+    buttonPanel.add(quitButton);
+    add(buttonPanel, BorderLayout.SOUTH);
+
+    setLocationRelativeTo(null);
+    setVisible(true);
+  }
+
+  // Other existing code
+  public static void main(String[] args)
+  {
+    new ManagerFeedback();
+  }
+
+  @Override
+  public void actionPerformed(ActionEvent e)
+  {
+    
+    if (e.getSource() == quitButton)
+    {
+      new ManagerInterface();
+      dispose();
     }
 
-    // Other existing code
+    if (e.getSource() == viewButton)
+    {
+      dispose();
+      String dbName = "LIST";
+      String tableName = "FEEDBACK";
+      String[] columnHeaders =
+      {
+        "ID", "name", "feedback"
+      };
 
-
-   public static void main(String[] args) {
-        new ManagerFeedback();
+      new DisplayFeedback(dbName, tableName, columnHeaders);
     }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-            
-        if (e.getSource() == quitButton) {
-           new ManagerInterface();
-            dispose(); 
-        }
-        
-         if (e.getSource() == viewButton) {
-           
-        }
-    }
+  }
 }

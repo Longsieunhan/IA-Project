@@ -4,6 +4,9 @@
  */
 package IAGUI;
 
+/*
+ * This class provides functionalities to interact with a MySQL database.
+ */
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.sql.DriverManager;
@@ -26,6 +29,7 @@ public class JavaDBAccessIA
     data = null;
   }
 
+  // This constructor takes a database name as input, sets dbName, and attempts to establish a connection using the provided name. It also initializes data to null.
   public JavaDBAccessIA(String dbName)
   {
     setDbName(dbName);
@@ -48,14 +52,15 @@ public class JavaDBAccessIA
     return dbConn;
   }
 
+// Establishes a connection to the database using JDBC. It uses the dbName property to construct the connection URL.
   public void setDbConn()
   {
-    String connectionURL = "jdbc:derby:" + this.dbName + ";create=true";
+    String connectionURL = "jdbc:mysql://localhost:3306/" + this.dbName;
     this.dbConn = null;
     try
     {
-      Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
-      this.dbConn = DriverManager.getConnection(connectionURL);
+      Class.forName("com.mysql.cj.jdbc.Driver");
+      this.dbConn = DriverManager.getConnection(connectionURL, "root", "mysql1");
     }
     catch (ClassNotFoundException ex)
     {
@@ -63,7 +68,7 @@ public class JavaDBAccessIA
     }
     catch (SQLException se)
     {
-      System.out.println("SQL Connection error!");
+      System.out.println("SQL Connection error 1!");
     }
   }
 
@@ -80,16 +85,22 @@ public class JavaDBAccessIA
     }
   }
 
+// Attempts to create a new database with the provided name. It returns true on success and false on failure.
   public boolean createDB(String newDbName)
   {
     setDbName(newDbName);
-    String connectionURL = "jdbc:derby:" + this.dbName + ";create=true";
+    Connection newConn;
+    String connectionURL = "jdbc:mysql://localhost:3306/";
+    String query = "CREATE DATABASE " + this.dbName;
     this.dbConn = null;
     try
     {
-      Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
-      this.dbConn = DriverManager.getConnection(connectionURL);
+      Class.forName("com.mysql.cj.jdbc.Driver");
+      newConn = DriverManager.getConnection(connectionURL, "root", "mysql1");
+      Statement s = newConn.createStatement();
+      s.executeUpdate(query);
       System.out.println("New database created: " + this.dbName);
+      newConn.close();
       return true;
     }
     catch (ClassNotFoundException ex)
@@ -104,17 +115,25 @@ public class JavaDBAccessIA
     }
   }
 
+  // This method retrieves data from a specified table. It takes the table name and an array of column headers as input.
+  // It returns an ArrayList<ArrayList<String>> where each inner ArrayList represents a row of data, 
+  // and each element within the inner ArrayList corresponds to a column value.
   public ArrayList<ArrayList<String>> getData(String tableName, String[] tableHeaders)
   {
+
+    String USER = "root";
+    String PASS = "mysql1";
+    String dbName = "LIST";
+    String connectionURL = "jdbc:mysql://localhost:3306/LIST";
     int columnCount = tableHeaders.length;
-    Statement s = null;
+    PreparedStatement s = null;
     ResultSet rs = null;
     String dbQuery = "SELECT * FROM " + tableName;
     data = new ArrayList<>();
 
-    try
+    try (Connection conn = DriverManager.getConnection(connectionURL, USER, PASS);)
     {
-      s = this.dbConn.createStatement();
+      s = conn.prepareStatement(dbQuery);
       rs = s.executeQuery(dbQuery);
 
       while (rs.next())
@@ -154,12 +173,12 @@ public class JavaDBAccessIA
       s.execute(newTable);
       System.out.println("New table created!");
       this.dbConn.close();
-       return true;
+      return true;
     }
     catch (SQLException se)
     {
       System.out.println("Error creating table " + newTable);
-       return false;
+      return false;
     }
   }
 
@@ -188,43 +207,27 @@ public class JavaDBAccessIA
 
   public static void main(String[] args)
   {
-    String dbName = "List";
-    String tableName = "EmployeeList";
-    String dbQuery = "INSERT INTO EmployeeList Values (?,?,?)";
+    String USER = "root";
+    String PASS = "mysql1";
+    String dbName = "LIST";
+    String tableName = "EMPLOYEE";
+    String connectionURL = "jdbc:mysql://localhost:3306/LIST";
+    String dbQuery = "INSERT INTO EMPLOYEE (name, age, status) VALUES (?, ?, ?)";
     String[] ColumnNames =
     {
-      "employee_name", "employee_age", "condition"
+      "ID", "name", "age", "status"
     };
-    
-    String dbName1 = "List1";
-    String tableName1 = "TaskList";
-    String dbQuery1 = "INSERT INTO TaskList Values(?,?,?)";
-    String[] ColumnNames1 = {
-       "task_name", "task_description", "task_deadline"
-    };
-    
-    
-
-    JavaDBAccessIA objAccess = new JavaDBAccessIA(dbName);
-    Connection myDBConn = objAccess.getDbConn();
-    
-    JavaDBAccessIA objAccess1 = new JavaDBAccessIA(dbName1);
-    Connection myDBConn1 = objAccess1.getDbConn();
-
-    String task_name = "projectA";
-    String task_description="Submit presentation";
-    String task_deadline="20/4/2024";
 
     String name = "Long";
     int age = 12;
-    String condition = "Good";
+    String status = "Good";
 
-    try
+    try (Connection conn = DriverManager.getConnection(connectionURL, USER, PASS);)
     {
-      PreparedStatement ps = myDBConn.prepareStatement(dbQuery);
+      PreparedStatement ps = conn.prepareStatement(dbQuery);
       ps.setString(1, name);
       ps.setInt(2, age);
-      ps.setString(3, condition);
+      ps.setString(3, status);
       ps.executeUpdate();
       System.out.println("Data inserted successfully into " + tableName);
     }
@@ -233,26 +236,114 @@ public class JavaDBAccessIA
       System.out.println("Error inserting data: " + se.getMessage());
     }
 
-    ArrayList<ArrayList<String>> myData = objAccess.getData(tableName, ColumnNames);
-    System.out.println(myData);
-    
-     try
-    {
-      PreparedStatement se = myDBConn1.prepareStatement(dbQuery1);
-      se.setString(1, task_name);
-      se.setString(2, task_description);
-      se.setString(3, task_deadline);
-      se.executeUpdate();
-      System.out.println("Data inserted successfully into " + tableName1);
-    }
-    catch (SQLException se)
-    {
-      System.out.println("Error inserting data: " + se.getMessage());
-    }
-
-    ArrayList<ArrayList<String>> myData1 = objAccess1.getData(tableName1, ColumnNames1);
-    System.out.println(myData1);
-    
+    /*   ******TASK*****
+ Public void insertTaskList(String taskname, String taskdescription, String taskdeadline) {
+     String query = "INSERT INTO TASK (taskname, taskdescription, taskdeadline, employees) VALUES (?, ?, ?)";
+//    try
+//    {
+//      PreparedStatement se = myDBConn1.prepareStatement(dbQuery1);
+//      se.setString(1, taskname);
+//      se.setString(2, taskdescription);
+//      se.setString(3, taskdeadline);
+        se.setString(4, employees); 
+//      se.executeUpdate();
+//      System.out.println("Data inserted successfully into " + tableName1);
+//    }
+//    catch (SQLException se)
+//    {
+//      System.out.println("Error inserting data: " + se.getMessage());
+//    }
+//
   }
+******EMPLOYEE*****
+//  public void InsertEmployeeList(String name, int age, String condition)
+//  {
+//    
+//    String query = "INSERT INTO EMPLOYEE (name, age, condition) VALUES (?, ?, ?)";
+//    
+//    try
+//    {
+//      PreparedStatement ps = this.dbConn.prepareStatement(query);
+//      ps.setString(1, name);
+//      ps.setInt(2, age);
+//      ps.setString(3, condition);
+//      ps.executeUpdate();
+//      System.out.println("Data inserted succesfully");
+//
+//    }
+//    catch (SQLException se)
+//    {
+//      System.out.println("Error inserting data: " + se.getMessage());
+//      se.printStackTrace();
+//    }
+
+//  }
+    
+    ******ATTENDANCE*****
+    public void insertAttendace(String name, String attendace) {
+     {
+//    
+//    String query = "INSERT INTO ATTENDACE (name, attendance, reason) VALUES (?, ?, ?)";
+//    
+//    try
+//    {
+//      PreparedStatement ps = this.dbConn.prepareStatement(query);
+//      ps.setString(1, name);
+//      ps.setString(2, attendance);
+        ps.setString(3, reason);
+//      ps.executeUpdate();
+//      System.out.println("Data inserted succesfully");
+//
+//    }
+//    catch (SQLException se)
+//    {
+//      System.out.println("Error inserting data: " + se.getMessage());
+//      se.printStackTrace();
+//    }
+
+//  }
+    
+    ******FEEDBACK*****
+    public void insertFeedback(String name, String attendace) {
+     {
+//    
+//    String query = "INSERT INTO FEEDBACK (name, feedback) VALUES (?, ?)";
+//    
+//    try
+//    {
+//      PreparedStatement ps = this.dbConn.prepareStatement(query);
+//      ps.setString(1, name);
+        ps.setString(2, feedback); 
+//      ps.executeUpdate();
+//      System.out.println("Data inserted succesfully");
+//
+//    }
+//    catch (SQLException se)
+//    {
+//      System.out.println("Error inserting data: " + se.getMessage());
+//      se.printStackTrace();
+//    }
+
+        ******NOTIFICATION*****
+    public void insertNotification(String notification) {
+     {
+//    
+//    String query = "INSERT INTO NOTIFACATION (notification) VALUES (?, ?)";
+//    
+//    try
+//    {
+//      PreparedStatement ps = this.dbConn.prepareStatement(query);
+//      ps.setString(1, notification);
+//      ps.executeUpdate();
+//      System.out.println("Data inserted succesfully");
+//
+//    }
+//    catch (SQLException se)
+//    {
+//      System.out.println("Error inserting data: " + se.getMessage());
+//      se.printStackTrace();
+//    }
   
+     */
+  }
 }

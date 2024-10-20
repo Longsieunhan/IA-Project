@@ -4,124 +4,127 @@
  */
 package IAGUI.IAManager;
 
-import static IAGUI.Login.LoginPage.BLUE_COLOR;
-import IAGUI.DeleteTaskList;
+/**
+ *
+ */
 import IAGUI.InsertTaskList;
+import IAGUI.DeleteTaskList;
+import IAGUI.DisplayTaskData;
+import IAGUI.IAManager.ManagerInterface;
 import IAGUI.UpdateTaskList;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import java.net.URL;
+import java.awt.Image;
+import javax.swing.ImageIcon;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
-public class ManagerWorkingProcess extends JFrame implements ActionListener {
-
-    private JLabel titleLabel;
-    private JButton taskInsertButton;
-    private JButton taskUpdateButton;
-    private JButton taskDeleteButton;
-    private JButton employeeInsertButton;
-    private JButton employeeUpdateButton;
-    private JButton employeeDeleteButton;
-    private JTextArea taskLabel;
-    private JPanel taskPanel;
-    private JPanel employeePanel;
-    private JPanel buttonPanel;
-    private JButton quitButton;
-
-    public ManagerWorkingProcess() {
-        super("Manager Working Process");
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.getContentPane().setBackground(BLUE_COLOR);
-        this.setBounds(100, 200, 600, 400);
-        this.setLayout(new BorderLayout());
-
-        titleLabel = new JLabel("Manager Working Process", JLabel.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 50));
-        titleLabel.setForeground(Color.WHITE);
-        add(titleLabel, BorderLayout.NORTH);
-
-        
-
-        taskLabel = new JTextArea("Taskname-Deadline");
-        taskLabel.setPreferredSize(new Dimension(200, 100));
-        taskLabel.setFont(new Font("Arial", Font.PLAIN, 16)); 
-
-        taskInsertButton = new JButton("Insert");
-        taskUpdateButton = new JButton("Update");
-        taskDeleteButton = new JButton("Delete");
-        quitButton = new JButton("Quit");
-
-        taskPanel = new JPanel();
-        buttonPanel= new JPanel();
-        taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS)); 
-        taskPanel.add(taskLabel);
-        buttonPanel.add(taskInsertButton);
-        buttonPanel.add(taskUpdateButton);
-        buttonPanel.add(taskDeleteButton);
-        buttonPanel.add(quitButton);
-
-        add(taskPanel, BorderLayout.CENTER); 
-        add(buttonPanel, BorderLayout.SOUTH); 
-
-        // Employee Panel
-        employeePanel = new JPanel();
-        employeePanel.setLayout(new BoxLayout(employeePanel, BoxLayout.Y_AXIS)); 
-        employeeInsertButton = new JButton("Insert");
-        employeeUpdateButton = new JButton("Update");
-        employeeDeleteButton = new JButton("Delete");
-
-        employeePanel.add(new JLabel("Employee Panel"));
-        employeePanel.add(employeeInsertButton);
-        employeePanel.add(employeeUpdateButton);
-        employeePanel.add(employeeDeleteButton);
-
-        add(employeePanel, BorderLayout.EAST); // Add employeePanel to the right side of the frame
-
-        // Add action listeners to the buttons
-        taskInsertButton.addActionListener(this);
-        taskUpdateButton.addActionListener(this);
-        taskDeleteButton.addActionListener(this);
-        employeeInsertButton.addActionListener(this);
-        employeeUpdateButton.addActionListener(this);
-        employeeDeleteButton.addActionListener(this);
-        quitButton.addActionListener(this);
-
-        setVisible(true);
+public class ManagerWorkingProcess extends JFrame implements ActionListener
+{
+  
+  public JLabel titleLabel;
+  public JButton taskInsertButton;
+  public JButton taskUpdateButton;
+  public JButton taskDeleteButton;
+  public JButton quitButton;
+  public JButton showtable;
+  public static final Color BLUE_COLOR = new Color(35, 79, 30);
+  public static final Color BLACK_COLOR = new Color(0, 0, 0);
+  public static final Font BIG_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 40);
+  
+  public URL IMG_PATH = getClass().getResource("thanhlong.png");
+  public ImageIcon companyImage;
+  public JLabel imageLabel;
+  public JPanel imagePanel;
+  
+  public ManagerWorkingProcess()
+  {
+    super("Manager Working Process");
+    this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+    this.getContentPane().setBackground(BLUE_COLOR);
+    this.setBounds(100, 200, 1000, 400);
+    this.setLayout(new BorderLayout());
+    
+    JLabel title = new JLabel("Manager Working Process");
+    title.setFont(BIG_FONT);
+    title.setForeground(Color.WHITE);
+    
+    JPanel titlePanel = new JPanel();
+    titlePanel.add(title);
+    
+    titlePanel.setBackground(BLUE_COLOR);
+    this.add(titlePanel, BorderLayout.NORTH);
+    
+    companyImage = new ImageIcon(new ImageIcon(IMG_PATH).getImage().getScaledInstance(400, 200, Image.SCALE_DEFAULT));
+    imagePanel = new JPanel();
+    imageLabel = new JLabel(companyImage);
+    imagePanel.add(imageLabel);
+    this.add(imagePanel, BorderLayout.CENTER);
+    
+    quitButton = new JButton("Quit");
+    showtable = new JButton("Show the table");
+    taskInsertButton = new JButton("Insert");
+    taskDeleteButton = new JButton("Delete");
+    taskUpdateButton = new JButton("Update"); 
+      
+    JPanel quitPanel = new JPanel();
+    quitPanel.add(quitButton);
+    quitPanel.add(showtable);
+    quitPanel.add(taskInsertButton);
+    quitPanel.add(taskUpdateButton);
+    quitPanel.add(taskDeleteButton);
+    taskInsertButton.addActionListener(this);
+    taskUpdateButton.addActionListener(this);
+    taskDeleteButton.addActionListener(this);
+    add(quitPanel, BorderLayout.SOUTH);
+    quitButton.addActionListener(this);
+    showtable.addActionListener(this);
+    
+    setLocationRelativeTo(null);
+    setVisible(true);
+  }
+  
+  public static void main(String[] args)
+  {
+    new ManagerWorkingProcess();
+  }
+  
+  @Override
+  public void actionPerformed(ActionEvent e)
+  {
+    
+    if (e.getSource() == taskInsertButton)
+    {
+      this.dispose();
+      new InsertTaskList();
     }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        // Handle button clicks
-        if (e.getSource() == taskInsertButton) {
-           new InsertTaskList();
-        } else if (e.getSource() == taskUpdateButton) {
-            new UpdateTaskList();
-        } else if (e.getSource() == taskDeleteButton) {
-           new DeleteTaskList();
-        } else if (e.getSource() == employeeInsertButton) {
-            JOptionPane.showMessageDialog(this, "Employee inserted click");
-        } else if (e.getSource() == employeeUpdateButton) {
-            JOptionPane.showMessageDialog(this, "Employee update click");
-        } else if (e.getSource() == employeeDeleteButton) {
-            JOptionPane.showMessageDialog(this, "Employee delete click");
-        }
-        else if (e.getSource() == quitButton) { 
-          this.dispose();
-          new ManagerInterface();
+    else if (e.getSource() == taskUpdateButton)
+    {
+      this.dispose();
+      new UpdateTaskList();
     }
+    else if (e.getSource() == taskDeleteButton)
+    {
+      this.dispose();
+      new DeleteTaskList();
     }
-    public static void main(String[] args) {
-        new ManagerWorkingProcess();
+    else if (e.getSource() == quitButton)
+    {
+      new ManagerInterface();
+      dispose();
+      // Perform action for quitButton
     }
+    else if (e.getSource() == showtable)
+    {
+      String dbName = "LIST";
+      String tableName = "TASK";
+      String[] columnHeaders =
+      {
+        "ID","Taskname", "Taskdescription", "Taskdeadline", "Employees"
+      };
+      new DisplayTaskData(dbName, tableName, columnHeaders);
+    }
+  }
 }
-

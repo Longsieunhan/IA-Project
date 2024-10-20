@@ -3,90 +3,118 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package IAGUI.IAEmployee;
-
+/**
+ * This class displays employee notifications in a table format.
+ */
+import IAGUI.DisplayEmployeeData;
 import static IAGUI.Login.LoginPage.BLUE_COLOR;
 import IAGUI.IAEmployee.EmployeeInterface;
+import IAGUI.JavaDBAccessIA;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
 
 /**
  *
- * @author nguyenthanhlong
  */
-public class EmployeeNotification extends JFrame implements ActionListener {
+public class EmployeeNotification extends JFrame implements ActionListener
+{
 
-    private JPanel buttonPanel;
-    private JLabel titleLabel;
-    private JTextArea NotificationText;
-    private JButton Edit;
-    private JButton Delete; 
-    private JButton  quitButton;
-    public static final Color BLUE_COLOR = new Color(35, 79, 30);
-    public static final Font BIG_FONT = new Font("Comic Sans MS", Font.BOLD | Font.ITALIC, 40);
+ private ArrayList<ArrayList<String>> dataList; // Stores raw data retrieved from the database
+  private Object[][] data; // Two-dimensional array used for the JTable
+  private JTable dbTable; // The table displaying employee notifications
+  private JScrollPane scrollTable; // Scroll pane for the table
+  private JTableHeader header;
+  private TableColumn column;
+  private JButton exit;
+  private JButton Update;
+  private JButton Insert;
+  private JButton Delete;
+  private JPanel buttonPanel;
+  private final Color Green_Color = new Color(35, 79, 30);
+  private final Color Nude_Color = new Color(235, 200, 178);
+  String[] headers =
+  {
+    "notification"
+  };
+  String USER = "root";
+  String PASS = "mysql1";
+  String connectionURL = "jdbc:mysql://localhost:3306/LIST";
 
-    public EmployeeNotification() {
-        super("Employee Feedback");
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.getContentPane().setBackground(Color.BLUE);
-        this.setBounds(100, 200, 600, 400);
-        this.setLayout(new BorderLayout());
+  public EmployeeNotification(String dbName, String tableName, String[] tableHeaders)
+  {
+    super("Display notification");
+    this.setBounds(100, 50, 800, 600);
+    this.getContentPane().setBackground(Green_Color);
+    this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        titleLabel = new JLabel("Employee Notification", JLabel.CENTER);
-        titleLabel.setFont(BIG_FONT);
-        titleLabel.setForeground(Color.WHITE);
-        this.add(titleLabel, BorderLayout.NORTH);
+    JavaDBAccessIA dbObj = new JavaDBAccessIA(dbName);
+    dbObj.setDbConn(); // Call setDbConn to establish connection
 
-        NotificationText = new JTextArea("Notification sent by the manager is shown here");
-        NotificationText.setPreferredSize(new Dimension(400, 100));
-        
-        JPanel feedbackPanel = new JPanel();
-        feedbackPanel.add(NotificationText);
-        this.add(feedbackPanel, BorderLayout.CENTER);
-        
-        Edit = new JButton("Edit");
-        Edit.addActionListener(this);
-        
-        Delete = new JButton("Delete");
-        Delete.addActionListener(this);
+    dataList = dbObj.getData(tableName, tableHeaders);
+    data = dbObj.to2dArray(dataList);
+    dbTable = new JTable(data, tableHeaders);
 
-        quitButton = new JButton("Quit");
-        quitButton.setPreferredSize(new Dimension(150, 50));
-        quitButton.addActionListener(this);
+    dbTable.setGridColor(Color.red);
+    dbTable.setBackground(Green_Color);
+    dbTable.setFont(new Font("Arial", Font.BOLD, 20));
+    dbTable.setForeground(Color.YELLOW);
 
-        buttonPanel = new JPanel();
-        buttonPanel.add(quitButton);
-        buttonPanel.add(Edit);
-        buttonPanel.add(Delete);
-        add(buttonPanel, BorderLayout.SOUTH);
+    dbTable.setRowHeight(40);
+    scrollTable = new JScrollPane();
+    scrollTable.getViewport().add(dbTable);
+    dbTable.setFillsViewportHeight(true);
 
-        
-        setLocationRelativeTo(null); 
-        setVisible(true);
+    this.buttonPanel = new JPanel();
+    this.exit = new JButton("Quit");
+    this.exit.addActionListener(this);
+    buttonPanel.add(exit);
+
+
+    this.add(buttonPanel, BorderLayout.SOUTH);
+    this.add(scrollTable, BorderLayout.NORTH);
+
+    this.setVisible(true);
+
+  }
+
+  public static void main(String[] args)
+  {
+    //db infor
+    String dbName = "LIST";
+    String tableName = "NOTIFICATION";
+    String[] columnHeaders =
+    {
+      "ID", "notification"
+    };
+
+    new EmployeeNotification(dbName, tableName, columnHeaders);
+  }
+
+  @Override
+  public void actionPerformed(ActionEvent e)
+  {
+    String command = e.getActionCommand();
+
+    if (command.equals("Quit"))
+    {
+      new EmployeeInterface();
+      this.dispose();
     }
-
-    public static void main(String[] args) {
-        new EmployeeNotification();
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-            String notification = NotificationText.getText();
-            // Process the feedback
-         if (e.getSource() == quitButton) {
-            // Handle quit button action
-            new EmployeeInterface();
-            this.dispose(); // Close the frame
-        }
-    }
+  }
 }

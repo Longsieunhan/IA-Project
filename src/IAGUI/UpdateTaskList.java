@@ -5,9 +5,10 @@
 package IAGUI;
 
 /**
- *
- * @author nguyenthanhlong
+ * This class implements a GUI window for updating task information in a database.
  */
+
+import IAGUI.IAManager.ManagerWorkingProcess;
 import static IAGUI.Login.LoginPage.BLUE_COLOR;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -15,6 +16,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import javax.swing.JButton;
@@ -31,7 +33,7 @@ public class UpdateTaskList extends JFrame implements ActionListener
   private JTextField taskName;
   private JTextField taskDescription;
   private JTextField taskDeadline;
-  private JLabel idLabel;
+  private JTextField employeeField;
   private JTextField idField;
   // control buttons
   private JButton updateButton;
@@ -42,7 +44,7 @@ public class UpdateTaskList extends JFrame implements ActionListener
   public UpdateTaskList()
   {
     //Format the frame
-    super("Edit Page");
+    super("Update Task Page");
     this.setBounds(100, 200, 1000, 400);
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.getContentPane().setBackground(BLUE_COLOR);
@@ -51,14 +53,16 @@ public class UpdateTaskList extends JFrame implements ActionListener
     taskName = new JTextField(20);
     taskDescription = new JTextField(20);
     taskDeadline = new JTextField(20);
+    employeeField = new JTextField(20);
+    idField = new JTextField(20);
 
     JLabel NameLabel = new JLabel("Task name");
     JLabel DescriptionLabel = new JLabel("Task description");
     JLabel TaskDeadlineLabel = new JLabel("Task deadline");
-     idLabel = new JLabel("Id");
-     idField = new JTextField(20);
+    JLabel employeeLabel = new JLabel("Employee");
+    JLabel idLabel = new JLabel("ID");
     
-    
+// Create data entry panel
     JPanel DataPanel = new JPanel();
     DataPanel.add(idLabel);
     DataPanel.add(idField);
@@ -68,6 +72,8 @@ public class UpdateTaskList extends JFrame implements ActionListener
     DataPanel.add(taskDescription);
     DataPanel.add(TaskDeadlineLabel);
     DataPanel.add(taskDeadline);
+    DataPanel.add(employeeLabel);
+    DataPanel.add(employeeField);
 
     this.add(DataPanel, BorderLayout.CENTER);
 
@@ -77,9 +83,13 @@ public class UpdateTaskList extends JFrame implements ActionListener
     JButton ShowTheTable = new JButton("Show the table");
     ShowTheTable.addActionListener(this);
 
+    JButton quitButton = new JButton("Quit");
+    quitButton.addActionListener(this);
+
     JPanel ButtonPanel = new JPanel();
     ButtonPanel.add(UpdateButton);
     ButtonPanel.add(ShowTheTable);
+    ButtonPanel.add(quitButton);
 
     this.add(ButtonPanel, BorderLayout.SOUTH);
 
@@ -91,57 +101,58 @@ public class UpdateTaskList extends JFrame implements ActionListener
   public void actionPerformed(ActionEvent e)
   {
     String command = e.getActionCommand();
-    // db info
-    String dbName = "List";
-    String tableName = "TaskList";
+    
+    // Database connection inf
+    String USER = "root";
+    String PASS = "mysql1";
+    String dbName = "LIST";
+    String tableName = "TASK";
+    String connectionURL = "jdbc:mysql://localhost:3306/LIST";
     String[] columnHeaders =
-    {
-      "Id", "task_name", "task_description", "task_deadline"
-    };
-    // connect to db
-    JavaDBAccessIA objDb = new JavaDBAccessIA(dbName);
-    Connection myDbConn = objDb.getDbConn();
-    // db query
-    String dbQuery = "UPDATE EmployeeList SET Id = ?,task_name =?, task_description =?, task_deadline=? WHERE Id=?";
-    // attributes   
+      {
+       "ID", "Taskname", "Taskdescription", "Taskdeadline", "Employees"
+      };
 
-    if (command.equals("Update"))
+    String dbQuery = "UPDATE TASK SET taskname = ?, taskdescription = ?, taskdeadline= ?, employees = ? WHERE ID = ?";
+
+    if (e.getActionCommand().equals("Update"))
     {
-      // receive data from text fields
-      try
+      try (Connection conn = DriverManager.getConnection(connectionURL, USER, PASS);)
       {
         String name = taskName.getText();
-        int description = Integer.parseInt(taskDescription.getText());
+        String description = taskDescription.getText();
         String deadline = taskDeadline.getText();
+        String employee = employeeField.getText();
         int id = Integer.parseInt(idField.getText());
-        
-        PreparedStatement ps = myDbConn.prepareStatement(dbQuery);
-        ps.setInt(1, id);
-        ps.setString(2, name);
-        ps.setInt(3, description);
-        ps.setString(4, deadline);
+
+        PreparedStatement ps = conn.prepareStatement(dbQuery);
+        ps.setString(1, name);
+        ps.setString(2, description);
+        ps.setString(3, deadline);
+        ps.setString(4, employee);
+        ps.setInt(5, id);
         ps.executeUpdate();
         System.out.println("Data updated successfully into " + tableName);
       }
       catch (SQLException se)
       {
-        System.out.println("Error updating data: " + se.getMessage());
+        System.out.println("Error inserting data: " + se.getMessage());
         se.printStackTrace();
-      } finally
-      {
-        try
-        {
-          myDbConn.close();
-        }
-        catch (SQLException ex)
-        {
-          System.out.println("Error closing database connection: " + ex.getMessage());
-          ex.printStackTrace();
-        }
       }
-      System.out.println("Data is updated");
+
     }
 
+    if (e.getActionCommand().equals("Quit"))
+    {
+      new ManagerWorkingProcess();
+      this.dispose();
+    }
+
+    if (e.getActionCommand().equals("Show the table"))
+    {
+      dispose();
+      new DisplayTaskData(dbName, tableName, columnHeaders);
+    }
   }
 
   public static void main(String[] arg)

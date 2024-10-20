@@ -1,123 +1,117 @@
+
+package IAGUI.IAManager;
+
+import static IAGUI.Login.LoginPage.BLUE_COLOR;
+import IAGUI.UpdateEmployeeList;
+import IAGUI.DeleteEmployeeList;
+import IAGUI.JavaDBAccessIA;
+import IAGUI.JavaDBAccessIA;
+import IAGUI.UpdateAttendance;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package IAGUI.IAManager;
-
 /**
  *
- * @author nguyenthanhlong
  */
-import static IAGUI.Login.LoginPage.BLUE_COLOR;
-import IAGUI.IAEmployee.EmployeeInterface;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+public class ManagerAttendance extends JFrame implements ActionListener
+{
 
-/**
- *
- * @author nguyenthanhlong
- */
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+  private ArrayList<ArrayList<String>> dataList;
+  private Object[][] data;
+  private JTable dbTable;
+  private JScrollPane scrollTable;
+  private JTableHeader header;
+  private TableColumn column;
+  private JButton exit;
+  private JButton Update;
+  private JButton Insert;
+  private JButton Delete; 
+  private JPanel buttonPanel;
+  private final Color Green_Color = new Color(77, 144, 80);
+  private final Color Nude_Color = new Color(235, 200, 178);
+  String[] headers =
+  {
+     "ID", "name", "attendance", "reason"
+  };
 
-/**
- *
- * @author nguyenthanhlong
- */
-public class ManagerAttendance extends JFrame implements ActionListener {
+  public ManagerAttendance(String dbName, String tableName, String[] tableHeaders)
+  {
+    super("Display data");
+    this.setBounds(100, 50, 800, 600);
+    this.getContentPane().setBackground(Green_Color);
+    this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-    private JPanel buttonPanel;
-    private JLabel titleLabel;
-    private JTextArea EmployeeText;
-    private JTextArea AttendanceText;
-    private JButton  quitButton;
-    private JPanel AttendancePanel;
-    public static final Color BLUE_COLOR = new Color(35, 79, 30);
-    public static final Font BIG_FONT = new Font("Comic Sans MS", Font.BOLD | Font.ITALIC, 40);
+    JavaDBAccessIA dbObj = new JavaDBAccessIA(dbName);
+    dataList = dbObj.getData(tableName, tableHeaders);
+    data = dbObj.to2dArray(dataList);
+    
 
-    public ManagerAttendance() {
-        super("Manager Attendance");
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.getContentPane().setBackground(Color.BLUE);
-        this.setBounds(200, 400, 600, 500);
-        this.setLayout(new BorderLayout());
-        
+    dbTable = new JTable(data, tableHeaders);
 
-        titleLabel = new JLabel("Manager Attendance", JLabel.CENTER);
-        titleLabel.setFont(BIG_FONT);
-        titleLabel.setForeground(Color.WHITE);
-        this.add(titleLabel, BorderLayout.NORTH);
-        
+    dbTable.setGridColor(Color.black);
+    dbTable.setBackground(Green_Color);
+    dbTable.setFont(new Font("Arial", Font.BOLD, 20));
+    dbTable.setForeground(Color.YELLOW);
 
-        EmployeeText = new JTextArea("Employees");
-        EmployeeText.setPreferredSize(new Dimension(200, 400));
-        EmployeeText.setLineWrap(true); 
-        EmployeeText.setWrapStyleWord(true);
-        
-        
-        AttendanceText = new JTextArea("Attendance");
-        AttendanceText.setPreferredSize(new Dimension(200, 400));
-        AttendanceText.setLineWrap(true); 
-        AttendanceText.setWrapStyleWord(true);
-        
-        
-        JPanel employeePanel = new JPanel();
-        employeePanel.add(EmployeeText);
-        this.add(employeePanel, BorderLayout.WEST);
-        
-        AttendancePanel = new JPanel();
-        AttendancePanel.add(AttendanceText);
-        this.add(AttendancePanel, BorderLayout.EAST);
-        
+    dbTable.setRowHeight(25);
+    scrollTable = new JScrollPane();
+    scrollTable.getViewport().add(dbTable);
+    dbTable.setFillsViewportHeight(true);
 
-        quitButton = new JButton("Quit");
-        quitButton.setPreferredSize(new Dimension(150, 50));
-        quitButton.addActionListener(this);
+    this.buttonPanel = new JPanel();
+    this.exit = new JButton("Exit");
+    this.exit.addActionListener(this);
+    buttonPanel.add(exit);
+    
 
-        buttonPanel = new JPanel();
-        buttonPanel.add(quitButton);
-        add(buttonPanel, BorderLayout.SOUTH);
+    
+  
+    
 
-        
-        setLocationRelativeTo(null); 
-        setVisible(true);
+    this.add(buttonPanel, BorderLayout.SOUTH);
+    this.add(scrollTable, BorderLayout.NORTH);
+
+    this.setVisible(true);
+
+  }
+
+
+public static void main(String[] args) {
+  String dbName = "LIST";
+  String tableName = "ATTENDANCE";
+  String[] columnHeaders = {"ID","name", "attendance", "reason"}; 
+  new ManagerAttendance(dbName, tableName, columnHeaders);
+}
+  
+  
+
+  @Override
+public void actionPerformed(ActionEvent e)
+  {
+   String command = e.getActionCommand();
+  
+     if (command.equals("Exit"))
+    {
+      this.dispose();
+     new ManagerInterface();
     }
-
-    public static void main(String[] args) {
-        new ManagerAttendance();
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-            String notification = EmployeeText.getText();
-            // Process the feedback
-         if (e.getSource() == quitButton) {
-            // Handle quit button action
-            new EmployeeInterface();
-            this.dispose(); // Close the frame
-        }
-    }
+     
+    
+  }
 }

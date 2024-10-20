@@ -5,28 +5,33 @@
 package IAGUI.IAEmployee;
 
 /**
+ * This class implements a GUI window for employees to submit their daily attendance.
  *
- * @author nguyenthanhlong
- */
+*/
+import IAGUI.IAManager.ManagerAttendance;
 import static IAGUI.Login.LoginPage.BLUE_COLOR;
 import IAGUI.JavaDBAccessIA;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
-public class EmployeeAttendance extends JFrame implements ActionListener
+public class EmployeeAttendance extends JFrame implements ActionListener, ItemListener
 {
   // Constants
 
   public static final Color BLUE_COLOR = new Color(35, 79, 30);
-  public static final Font BIG_FONT = new Font("Comic Sans MS", Font.BOLD | Font.ITALIC, 40);
+  public static final Font BIG_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 40);
 
   // Components
   private JLabel titleLabel, reason, name;
   private JTextField reasonField, nameField;
   private JRadioButton presentButton, absentButton;
   private JButton submitButton, quitButton;
+ 
 
   public EmployeeAttendance()
   {
@@ -50,6 +55,7 @@ public class EmployeeAttendance extends JFrame implements ActionListener
     presentButton = new JRadioButton("Present");
     absentButton = new JRadioButton("Absent");
 
+    
     ButtonGroup buttonGroup = new ButtonGroup();
     buttonGroup.add(presentButton);
     buttonGroup.add(absentButton);
@@ -95,49 +101,88 @@ public class EmployeeAttendance extends JFrame implements ActionListener
     {
       if (presentButton.isSelected())
       {
-        String dbName = "List";
-        String tableName = "AttendanceList";
+        String USER = "root";
+        String PASS = "mysql1";
+        String connectionURL = "jdbc:mysql://localhost:3306/LIST";
+
+        String dbName = "LIST";
+        String tableName = "ATTENDANCE";
         String[] columnHeaders =
         {
-          "Id", "name", "attendance", "reason"
+          "ID", "name", "attendance", "reason"
         };
-        String query = "INSERT INTO AttendanceList (Id, name, attendance, reason) VALUES (?, ?, ?, ?)";
 
-        JavaDBAccessIA objAccess = new JavaDBAccessIA(dbName);
-        objAccess.setDbConn();
-        Connection myDbConn = objAccess.getDbConn();
+        String name = nameField.getText();
+        String attendance = "Present";
+        String reason = "None";
+        String query = "INSERT INTO ATTENDANCE (name, attendance, reason) VALUES (?, ?, ?)";
+
+        try (Connection conn = DriverManager.getConnection(connectionURL, USER, PASS);)
+        {
+          PreparedStatement ps = conn.prepareStatement(query);
+          ps.setString(1, name);
+          ps.setString(2, attendance);
+          ps.setString(3, reason);
+          ps.executeUpdate();
+          System.out.println("Data inserted successfully");
+        }
+
+        catch (SQLException se)
+        {
+          System.out.println("Error inserting data: " + se.getMessage());
+          se.printStackTrace();
+        }
+
       }
       else if (absentButton.isSelected())
       {
-        String dbName = "List";
-        String tableName = "AttendanceList";
+
+        String USER = "root";
+        String PASS = "mysql1";
+        String connectionURL = "jdbc:mysql://localhost:3306/LIST";
+        String dbName = "LIST";
+        String tableName = "ATTENDANCE";
         String[] columnHeaders =
         {
-          "Id", "name", "attendance", "reason"
+          "ID", "name", "attendance", "reason"
         };
-        String query = "INSERT INTO AttendanceList (Id, name, attendance, reason) VALUES (?, ?, ?, ?)";
 
-        JavaDBAccessIA objAccess = new JavaDBAccessIA(dbName);
-        objAccess.setDbConn();
-        Connection myDbConn = objAccess.getDbConn();
+        String name = nameField.getText();
+        String attendance = "Absent";
+        String reason = reasonField.getText();
+        String query = "INSERT INTO ATTENDANCE (name, attendance, reason) VALUES (?, ?, ?)";
+
+        try (Connection conn = DriverManager.getConnection(connectionURL, USER, PASS);)
+        {
+          PreparedStatement ps = conn.prepareStatement(query);
+          ps.setString(1, name);
+          ps.setString(2, attendance);
+          ps.setString(3, reason);
+          ps.executeUpdate();
+          System.out.println("Data inserted successfully");
+        }
+
+        catch (SQLException se)
+        {
+          System.out.println("Error inserting data: " + se.getMessage());
+          se.printStackTrace();
+        }
 
       }
-      else
-      {
-        JOptionPane.showMessageDialog(this, "Please select attendance status");
-      }
+      JOptionPane.showMessageDialog(this, "Attendance is submitted");
     }
     else if (e.getSource() == quitButton)
     {
       this.dispose();
+      new EmployeeInterface();
 
     }
 
   }
+
+  @Override
+  public void itemStateChanged(ItemEvent e)
+  {
+    throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+  }
 }
-
-
-
-
-
-/// String attendance = presentRadioButtoon.isSelected() ? "Present" : "Absent";

@@ -3,7 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package IAGUI.IAEmployee;
-
+/**
+ * This class implements a GUI window for employees to submit feedback.
+ */
 import static IAGUI.Login.LoginPage.BLUE_COLOR;
 import IAGUI.IAManager.ManagerFeedback;
 import IAGUI.JavaDBAccessIA;
@@ -16,6 +18,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import javax.swing.JButton;
@@ -31,19 +34,21 @@ public class EmployeeFeedback extends JFrame implements ActionListener
 
   private JPanel buttonPanel;
   private JLabel titleLabel;
-  private JTextArea nameArea;
-  private JTextArea descriptionArea;
+  private JTextArea nameField;
+  private JTextArea feedbackField;
   private JButton submitButton, quitButton;
   private JLabel nameLabel;
   private JLabel descriptionLabel;
   public static final Color BLUE_COLOR = new Color(35, 79, 30);
-  public static final Font BIG_FONT = new Font("Comic Sans MS", Font.BOLD | Font.ITALIC, 40);
+  public static final Font BIG_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 40);
+  private ManagerFeedback managerFeedback;
+  private String feedbackText;
 
   public EmployeeFeedback()
   {
     super("Employee Feedback");
     this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-    this.getContentPane().setBackground(Color.BLUE);
+    this.getContentPane().setBackground(BLUE_COLOR);
     this.setBounds(100, 200, 600, 400);
     this.setLayout(new BorderLayout());
     this.setLayout(new GridLayout(4, 1));
@@ -55,22 +60,22 @@ public class EmployeeFeedback extends JFrame implements ActionListener
 
     nameLabel = new JLabel("Name");
 
-    nameArea = new JTextArea();
-    nameArea.setPreferredSize(new Dimension(200, 50));
+    nameField = new JTextArea();
+    nameField.setPreferredSize(new Dimension(200, 50));
 
     descriptionLabel = new JLabel("Description");
 
-    descriptionArea = new JTextArea();
-    descriptionArea.setPreferredSize(new Dimension(200, 50));
+    feedbackField = new JTextArea();
+    feedbackField.setPreferredSize(new Dimension(200, 50));
 
     JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
     namePanel.add(nameLabel);
-    namePanel.add(nameArea);
+    namePanel.add(nameField);
     add(namePanel); // Add namePanel to the center of the frame
 
     JPanel descriptionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
     descriptionPanel.add(descriptionLabel);
-    descriptionPanel.add(descriptionArea);
+    descriptionPanel.add(feedbackField);
     add(descriptionPanel);
 
     submitButton = new JButton("Submit");
@@ -98,33 +103,48 @@ public class EmployeeFeedback extends JFrame implements ActionListener
   @Override
   public void actionPerformed(ActionEvent e)
   {
-    String name = nameArea.getText();
-    String descriptionString = descriptionArea.getText();
-
-    if (e.getSource() == submitButton)
+    String command = e.getActionCommand();
+    // db info
+    String dbName = "LIST";
+    String tableName = "FEEDBACK";
+    String USER = "root";
+    String PASS = "mysql1";
+    String connectionURL = "jdbc:mysql://localhost:3306/LIST";
+    String[] columnHeaders =
     {
-      String dbName = "Feedback";
-      String tableName = "FeedbackList";
-      String query = "INSERT INTO FEEDBACKLIST(name, description) VALUES(?, ?)";
+      "ID", "name", "feedback"
+    };
 
-      JavaDBAccessIA objAccess = new JavaDBAccessIA(dbName);
-      Connection myDbConn = objAccess.getDbConn();
+    // db query
+    String dbQuery = "INSERT INTO FEEDBACK (name, feedback) VALUES (?, ?)";
+    // attributes   
 
-      try
+    if (command.equals("Submit"))
+    {
+
+      try (Connection conn = DriverManager.getConnection(connectionURL, USER, PASS);)
       {
-        PreparedStatement ps = myDbConn.prepareStatement(query);
+        String name = nameField.getText();
+        String feedback = feedbackField.getText();
+
+        PreparedStatement ps = conn.prepareStatement(dbQuery);
         ps.setString(1, name);
-        ps.setString(2, descriptionString);
+        ps.setString(2, feedback);
         ps.executeUpdate();
-        JOptionPane.showMessageDialog(this, "Feedback submitted successfully.");
+        System.out.println("Data inserted successfully into " + tableName);
+        nameField.setText("");
+        feedbackField.setText("");
+        JOptionPane.showMessageDialog(this, "Feedback is submitted");
       }
       catch (SQLException se)
       {
-        System.out.println("Error inserting data: " + se.getMessage());
+        System.out.println("Error updating data: " + se.getMessage());
         se.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Failed to submit feedback. Please try again.");
+
       }
+      System.out.println("Data is updated");
     }
+
     else if (e.getSource() == quitButton)
     {
       new EmployeeInterface();
